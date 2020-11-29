@@ -46,7 +46,7 @@ app.post('/api/shorturl/new', async(req, res) => {
   const { url } = req.body;
 
   if (!validUrl.isUri(url)){
-    return res.json({"error":"invalid url"});
+    return res.json({error: 'invalid url'});
   }
 
   const urlObj = await URL.findOne({
@@ -82,11 +82,10 @@ const url = await URL.findOne({
 if (url) {
   res.redirect(url.original_url);
 } else {
-  res.json({error:"invalid url"});
+  res.json({error: 'invalid url'});
 }
 });
 
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);
 });
-
