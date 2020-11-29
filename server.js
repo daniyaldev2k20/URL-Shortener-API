@@ -45,7 +45,7 @@ app.get('/api/hello', function(req, res) {
 app.post('/api/shorturl/new', async(req, res) => {
   const { url } = req.body;
 
-  if (!validUrl.isUri(url)){
+  if (!validUrl.isWebUri(url)){
     return res.json({error: 'invalid url'});
   }
 
@@ -60,7 +60,7 @@ app.post('/api/shorturl/new', async(req, res) => {
       })
   }else{
     const original_url = url;
-    const short_url = nanoid(4);
+    const short_url = nanoid(3);
     const newUrlObj = await URL.create({
       original_url,
       short_url,
