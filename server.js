@@ -45,6 +45,7 @@ app.get('/api/hello', function(req, res) {
 app.post('/api/shorturl/new', async(req, res) => {
   const { url } = req.body;
 
+  //Changed isUri to isWebUri
   if (!validUrl.isWebUri(url)){
     return res.json({error: 'invalid url'});
   }
