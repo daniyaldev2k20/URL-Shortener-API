@@ -1,11 +1,11 @@
 const dotenv = require("dotenv");
 const express = require('express');
 const cors = require('cors');
-const app = express();
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const { nanoid } = require('nanoid');
 var validUrl = require('valid-url');
+const app = express();
 
 // Basic Configuration
 dotenv.config({ path: "./config.env" });
@@ -17,7 +17,7 @@ app.use(
     extended: false,
   })
 );
-app.use(cors());
+app.use(cors()); 
 app.use(express.json());
 
 mongoose
@@ -43,27 +43,34 @@ app.get('/api/hello', function(req, res) {
 });
 
 app.post('/api/shorturl/new', async(req, res) => {
-  const url = req.body.url
+  const { url } = req.body;
 
   if (!validUrl.isUri(url)){
-    return res.json({
-      error: 'invalid url' 
-    })
+    return res.json({"error":"invalid url"});
   }
 
-  const original_url = url;
-  const short_url = nanoid();
+  const urlObj = await URL.findOne({
+    original_url: url,
+  });
 
-  const urlObj = await URL.create({
-    original_url,
-    short_url,
+  if(urlObj){
+    return res.json({
+      original_url: urlObj.original_url,
+      short_url: urlObj.short_url,
+      })
+  }else{
+    const original_url = url;
+    const short_url = nanoid(4);
+    const newUrlObj = await URL.create({
+      original_url,
+      short_url,
   })
-
+  
   res.json({
-    original_url: urlObj.original_url,
-    short_url: urlObj.short_url,
+    original_url: newUrlObj.original_url,
+    short_url: newUrlObj.short_url,
   })
-
+  }
 })
 
 app.get("/api/shorturl/:short_url", async (req, res) => {
@@ -75,9 +82,8 @@ const url = await URL.findOne({
 if (url) {
   res.redirect(url.original_url);
 } else {
-  return res.json({error: "invalid url"});
+  res.json({error:"invalid url"});
 }
-
 });
 
 app.listen(port, function() {
